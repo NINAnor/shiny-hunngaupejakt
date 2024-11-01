@@ -12,25 +12,45 @@ RUN install2.r --error \
     fuzzyjoin \
     shinyWidgets \
     shinythemes \
-    bayestestR
+    bayestestR \
+    golem \
+    shinybusy \
+    popbio \
+    shinycssloaders \
+    maditr \
+    MESS \
+    shinyvalidate \
+    shinyBS \
+    shinyscreenshot
 
 
 # Install GitHub packages
 RUN R -e "devtools::install_github('DrMattG/HarvestGolem')" && \
     R -e "devtools::install_github('dreamRs/capture')"
 
+# Copy the custom shiny-server.conf file
+COPY shiny-server.conf /etc/shiny-server/shiny-server.conf
+
+# Set environment variable for logging to /dev/null
+ENV SHINY_LOG_DIR=/dev/null
+
+# Redirect error output to stderr
+ENV SHINY_LOG_STDERR=1
+
 # Copy the app
 COPY app.R /srv/shiny-server/
+RUN rm -rf /srv/shiny-server/sample-apps /srv/shiny-server/index.html /srv/shiny-server/[0-9]*
 
-# Configure logging to stdout/stderr
-RUN ln -sf /dev/stdout /var/log/shiny-server.log && \
-    ln -sf /dev/stderr /var/log/shiny-server.err
+# Set permissions and ownership
+RUN chown -R shiny:shiny /srv/shiny-server && \
+    chmod -R 755 /srv/shiny-server
 
-# Set permissions
-RUN sudo chown -R shiny:shiny /srv/shiny-server
+
+# Switch to shiny user
+USER shiny
 
 # Expose port
 EXPOSE 3838
 
-# Use shiny-server with logging configuration
+# Use shiny-server
 CMD ["/usr/bin/shiny-server"]

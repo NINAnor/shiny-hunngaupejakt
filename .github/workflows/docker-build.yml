@@ -3,10 +3,10 @@ name: Docker Build and Push to GHCR
 on:
   push:
     branches:
-      - main
+      - production
   pull_request:
     branches:
-      - main
+      - production
 
 jobs:
   build:
@@ -15,11 +15,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      with:
-        lfs: true
-    - name: Checkout LFS objects
-      run: git lfs checkout
-
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
