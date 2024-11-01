@@ -12,7 +12,8 @@ RUN install2.r --error \
     fuzzyjoin \
     shinyWidgets \
     shinythemes \
-    bayestestR
+    bayestestR \
+    golem
 
 
 # Install GitHub packages
