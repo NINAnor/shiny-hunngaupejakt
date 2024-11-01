@@ -3,20 +3,28 @@ FROM rocker/shiny-verse:4.2.1
 # Install R packages
 RUN install2.r --error \
     --deps TRUE \
-    devtools
+    devtools \
+    plotly \
+    fuzzyjoin \
+    shinyWidgets \
+    shinythemes \
+    bayestestR
 
-# Install packages
-RUN R -e "BiocManager::install('graph')"
-RUN R -e "devtools::install_github('DrMattG/HarvestGolem')"
+# Install Bioconductor packages
+RUN R -e "if (!requireNamespace('BiocManager', quietly = TRUE)) install.packages('BiocManager')" && \
+    R -e "BiocManager::install('graph')"
 
-# copy the app and scripts to the image. *.r if multiple
+# Install GitHub packages
+RUN R -e "devtools::install_github('DrMattG/HarvestGolem')" && \
+    R -e "devtools::install_github('dreamRs/capture')"
+
+# Copy the app
 COPY app.R /srv/shiny-server/
 
-
-# Ports exposed on the container
+# Expose port
 EXPOSE 3838
 
-# allow permission
+# Set permissions
 RUN sudo chown -R shiny:shiny /srv/shiny-server
 
 CMD Rscript /srv/shiny-server/app.R
