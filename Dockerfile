@@ -28,6 +28,15 @@ RUN install2.r --error \
 RUN R -e "devtools::install_github('DrMattG/HarvestGolem')" && \
     R -e "devtools::install_github('dreamRs/capture')"
 
+# Install renv package
+RUN R -e "install.packages('renv')"
+
+# Copy the renv.lock file generated in Method 1
+#COPY renv.lock /renv.lock
+
+# Restore packages listed in renv.lock
+#RUN R -e "renv::restore()"
+
 # Copy the custom shiny-server.conf file
 COPY shiny-server.conf /etc/shiny-server/shiny-server.conf
 
