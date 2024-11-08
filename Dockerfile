@@ -1,5 +1,10 @@
 FROM rocker/shiny-verse:4.2.1
 
+# Update apt package list and install JAGS
+RUN apt-get update && \
+    apt-get install -y jags && \
+    rm -rf /var/lib/apt/lists/*
+
 # Install Bioconductor packages
 RUN R -e "if (!requireNamespace('BiocManager', quietly = TRUE)) install.packages('BiocManager')" && \
     R -e "BiocManager::install(c('IRanges', 'graph'))"
