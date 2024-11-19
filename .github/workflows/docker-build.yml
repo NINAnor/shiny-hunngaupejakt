@@ -1,35 +1,42 @@
 name: Docker Build and Push to GHCR
 
 on:
-  push:
-    branches:
-      - production
+  # Combine push and PR triggers with branch conditions
   pull_request:
-    branches:
-      - production
+    branches: [ production, dev ]
+  push:
+    branches: [ production, dev ]
 
 jobs:
-  build:
+  docker-build-push:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Log in to GitHub Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GHCR_PAT }}
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
 
-    - name: Build Docker Image
-      run: |
-        docker build -t ghcr.io/ninanor/hunngaupejakt:latest .
+      - name: Set Docker tag based on branch
+        id: set-tag
+        run: |
+          if [[ ${{ github.ref }} == 'refs/heads/production' ]]; then
+            echo "TAG=latest" >> $GITHUB_OUTPUT
+          else
+            echo "TAG=dev" >> $GITHUB_OUTPUT
+          fi
 
-    - name: Push Docker Image
-      run: |
-        docker push ghcr.io/ninanor/hunngaupejakt:latest
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/ninanor/hunngaupejakt:${{ steps.set-tag.outputs.TAG }}
