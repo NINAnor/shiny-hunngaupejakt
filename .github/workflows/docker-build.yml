@@ -3,9 +3,9 @@ name: Docker Build and Push to GHCR
 on:
   # Combine push and PR triggers with branch conditions
   pull_request:
-    branches: [ production, dev ]
+    branches: [ production, test ]
   push:
-    branches: [ production, dev ]
+    branches: [ production, test ]
 
 jobs:
   docker-build-push:
@@ -31,7 +31,7 @@ jobs:
           if [[ ${{ github.ref }} == 'refs/heads/production' ]]; then
             echo "TAG=latest" >> $GITHUB_OUTPUT
           else
-            echo "TAG=dev" >> $GITHUB_OUTPUT
+            echo "TAG=test" >> $GITHUB_OUTPUT
           fi
 
       - name: Build and push Docker image
