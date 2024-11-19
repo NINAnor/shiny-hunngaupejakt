@@ -1,5 +1,10 @@
 FROM rocker/shiny-verse:4.2.1
 
+# Update apt package list and install JAGS
+RUN apt-get update && \
+    apt-get install -y jags && \
+    rm -rf /var/lib/apt/lists/*
+
 # Install Bioconductor packages
 RUN R -e "if (!requireNamespace('BiocManager', quietly = TRUE)) install.packages('BiocManager')" && \
     R -e "BiocManager::install(c('IRanges', 'graph'))"
@@ -27,6 +32,15 @@ RUN install2.r --error \
 # Install GitHub packages
 RUN R -e "devtools::install_github('DrMattG/HarvestGolem')" && \
     R -e "devtools::install_github('dreamRs/capture')"
+
+# Install renv package
+RUN R -e "install.packages('renv')"
+
+# Copy the renv.lock file generated in Method 1
+#COPY renv.lock /renv.lock
+
+# Restore packages listed in renv.lock
+#RUN R -e "renv::restore()"
 
 # Copy the custom shiny-server.conf file
 COPY shiny-server.conf /etc/shiny-server/shiny-server.conf
