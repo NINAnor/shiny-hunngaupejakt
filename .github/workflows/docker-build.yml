@@ -6,6 +6,7 @@ on:
     branches: [ production, test ]
   push:
     branches: [ production, test ]
+  workflow_dispatch:
 
 jobs:
   docker-build-push:
